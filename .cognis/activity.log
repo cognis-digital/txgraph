@@ -3,3 +3,4 @@
 2024-07-15T13:01:11  docs: ELI5 pass
 2024-08-12T08:18:18  style(config): add a dry-run flag
 2024-08-21T15:35:25  feat(scan): add a fast path for the common case
+2024-09-18T10:52:32  docs(core): add a regression fixture

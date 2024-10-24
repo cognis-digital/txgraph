@@ -5,3 +5,4 @@
 2024-08-21T15:35:25  feat(scan): add a fast path for the common case
 2024-09-18T10:52:32  docs(core): add a regression fixture
 2024-09-27T17:09:39  perf(output): extract the scorer
+2024-10-24T12:26:46  docs: here be dragons

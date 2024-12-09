@@ -8,3 +8,4 @@
 2024-10-24T12:26:46  docs: here be dragons
 2024-11-03T19:43:53  fix(fixtures): wire the MCP tool schema
 2024-11-29T14:00:00  refactor(report): make timestamps timezone-aware
+2024-12-09T09:17:07  test(docs): guard against ReDoS in patterns

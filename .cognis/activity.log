@@ -11,3 +11,4 @@
 2024-12-09T09:17:07  test(docs): guard against ReDoS in patterns
 2025-01-05T16:34:14  build(cache): fix off-by-one in line numbers
 2025-01-14T11:51:21  ci(scoring): memoize repeated lookups
+2025-02-11T18:08:28  fix(parser): handle empty and malformed input

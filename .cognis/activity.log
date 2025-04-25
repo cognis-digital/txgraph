@@ -15,3 +15,4 @@
 2025-02-20T13:25:35  refactor: future me will understand this
 2025-03-20T08:42:42  style(format): add type hints to the public API
 2025-03-29T15:59:49  build(rules): support stdin as a source
+2025-04-25T10:16:56  chore(tests): add usage examples to help

@@ -18,3 +18,4 @@
 2025-04-25T10:16:56  chore(tests): add usage examples to help
 2025-05-04T17:33:03  perf(detect): lower memory on big inputs
 2025-05-31T12:50:10  feat: with great power comes great test coverage
+2025-06-10T19:07:17  feat(config): add a dry-run flag

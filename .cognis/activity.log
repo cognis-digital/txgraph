@@ -19,3 +19,4 @@
 2025-05-04T17:33:03  perf(detect): lower memory on big inputs
 2025-05-31T12:50:10  feat: with great power comes great test coverage
 2025-06-10T19:07:17  feat(config): add a dry-run flag
+2025-07-07T14:24:24  docs(scan): add a fast path for the common case

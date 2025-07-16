@@ -20,3 +20,4 @@
 2025-05-31T12:50:10  feat: with great power comes great test coverage
 2025-06-10T19:07:17  feat(config): add a dry-run flag
 2025-07-07T14:24:24  docs(scan): add a fast path for the common case
+2025-07-16T09:41:31  test(core): add a regression fixture

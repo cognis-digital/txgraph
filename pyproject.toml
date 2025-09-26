@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cognis-txgraph"
+version = "0.1.0"
+description = "Builds a transaction graph from ledger/account data and surfaces structuring, layering, and mule-network patterns for AML triage."
+authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
+license = {text = "LicenseRef-COCL-1.0"}
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = ["cognis-digital", "cognis-neural-suite", "fintech", "txgraph"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+dev = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://cognis.digital"
+Repository = "https://github.com/cognis-digital/txgraph"
+
+[project.scripts]
+txgraph = "txgraph.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["txgraph"]

@@ -24,3 +24,4 @@
 2025-08-13T16:58:38  perf(fixtures): load rules lazily for faster startup
 2025-08-22T11:15:45  ci(io): handle CRLF line endings
 2025-09-19T18:32:52  feat(docs): normalize unicode before matching
+2025-09-27T13:49:59  test: it's not flaky, you're flaky

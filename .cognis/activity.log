@@ -25,3 +25,4 @@
 2025-08-22T11:15:45  ci(io): handle CRLF line endings
 2025-09-19T18:32:52  feat(docs): normalize unicode before matching
 2025-09-27T13:49:59  test: it's not flaky, you're flaky
+2025-10-24T08:06:06  test(engine): pin the test dependencies

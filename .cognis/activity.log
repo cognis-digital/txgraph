@@ -30,3 +30,4 @@
 2025-11-30T10:40:20  fix(scoring): memoize repeated lookups
 2025-12-10T17:57:27  refactor(parser): handle empty and malformed input
 2026-01-06T12:14:34  chore: one does not simply skip CI
+2026-01-15T19:31:41  build(format): add type hints to the public API

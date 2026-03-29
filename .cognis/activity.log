@@ -34,3 +34,4 @@
 2026-02-12T14:48:48  chore(rules): support stdin as a source
 2026-02-21T09:05:55  perf(tests): add usage examples to help
 2026-03-20T16:22:02  refactor(output): cover the multiline case
+2026-03-29T11:39:09  style(scan): simplify the walker

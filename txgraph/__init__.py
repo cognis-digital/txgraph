@@ -1,2 +1,11 @@
-"""TXGRAPH — Builds a transaction graph from ledger/account data and surfaces structuring, layering, and mule-network patterns for AML triage."""
-__version__ = "0.1.0"
+"""txgraph — part of the Cognis Neural Suite."""
+try:  # re-export the tool's public API + identity from core
+    from txgraph.core import *  # noqa: F401,F403
+except Exception:  # pragma: no cover
+    pass
+try:
+    from txgraph.core import TOOL_NAME, TOOL_VERSION
+except Exception:  # pragma: no cover
+    TOOL_NAME = "txgraph"
+    TOOL_VERSION = "0.1.0"
+__version__ = TOOL_VERSION

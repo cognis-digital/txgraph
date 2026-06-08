@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: txgraph, labels: { app: txgraph } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: txgraph } }
+  template:
+    metadata: { labels: { app: txgraph } }
+    spec:
+      containers:
+        - name: txgraph
+          image: ghcr.io/cognis-digital/txgraph:latest
+          ports: [{ containerPort: 8000 }]
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: txgraph }
+spec:
+  selector: { app: txgraph }
+  ports: [{ port: 80, targetPort: 8000 }]

@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/txgraph",
+  "version": "0.2.0",
+  "description": "JavaScript port of txgraph (Cognis Neural Suite)",
+  "bin": {
+    "txgraph": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}

@@ -16,9 +16,9 @@ from __future__ import annotations
 
 import csv
 import io
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional
 
 # Default reporting threshold (USD). Structuring is sub-threshold by design.
 DEFAULT_REPORT_THRESHOLD = 10000.0

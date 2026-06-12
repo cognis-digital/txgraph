@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-txgraph
+pip install "git+https://github.com/cognis-digital/txgraph.git"
 txgraph scan .            # → prioritized findings in seconds
 ```
 
@@ -52,7 +52,7 @@ Graph-based money-laundering detection is academically hot but has no plug-and-p
 ## Quick start
 
 ```bash
-pip install cognis-txgraph
+pip install "git+https://github.com/cognis-digital/txgraph.git"
 txgraph --version
 txgraph scan .                       # scan current project
 txgraph scan . --format json         # machine-readable

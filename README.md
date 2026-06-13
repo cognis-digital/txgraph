@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/txgraph.git"
 txgraph scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+txgraph reads a spreadsheet of financial transactions and automatically flags suspicious money patterns — like someone breaking a large payment into several smaller ones to dodge reporting limits (structuring), funds bouncing through a chain of accounts to hide their origin (layering), or accounts that collect money from many sources and quickly pass it on (money mule networks). You run one command pointing at your CSV file and get a plain-English report of what looks fishy, along with a SAR (Suspicious Activity Report) summary ready for compliance review. It is aimed at compliance analysts, fraud investigators, and developers who need a fast, scriptable way to screen transaction data for anti-money-laundering red flags without standing up a database or cloud service.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why txgraph?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -49,6 +55,42 @@ Graph-based money-laundering detection is academically hot but has no plug-and-p
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`txgraph` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/txgraph/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/txgraph/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/txgraph.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/txgraph.git"  # uv
+pip install "git+https://github.com/cognis-digital/txgraph.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/txgraph.git
+cd txgraph && pip install .
+```
+
+Then run:
+```sh
+txgraph --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash

@@ -20,6 +20,40 @@ pip install cognis-txgraph
 txgraph scan .            # → prioritized findings in seconds
 ```
 
+## Usage — step by step
+
+1. **Install** (Python 3.9+):
+
+   ```bash
+   pip install txgraph
+   ```
+
+2. **Scan a transaction CSV** for AML patterns (structuring, layering, etc.):
+
+   ```bash
+   txgraph scan transactions.csv
+   ```
+
+3. **Tune detection.** Set the structuring report threshold and choose which severity should fail the run:
+
+   ```bash
+   txgraph scan transactions.csv --threshold 10000 --fail-on high
+   ```
+
+4. **Read the output.** Emit JSON for tooling, or print the SAR narrative for an analyst:
+
+   ```bash
+   txgraph scan transactions.csv --format json | jq '.findings[]'
+   txgraph scan transactions.csv --sar
+   ```
+
+5. **Gate in CI.** With `--fail-on`, the exit code is non-zero when matching findings exist:
+
+   ```bash
+   txgraph scan transactions.csv --fail-on any || echo "AML findings detected"
+   ```
+
+
 ## Contents
 
 - [Why txgraph?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)

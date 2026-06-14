@@ -34,3 +34,6 @@ txgraph = "txgraph.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["txgraph"]
+
+[tool.hatch.metadata]
+allow-direct-references = true

@@ -105,17 +105,34 @@ def main(argv: Optional[List[str]] = None) -> int:
         parser.print_help()
         return 2
 
+    if args.threshold <= 0:
+        print(
+            f"error: --threshold must be a positive number, got {args.threshold}",
+            file=sys.stderr,
+        )
+        return 2
+
     try:
         txs = load_transactions(args.csv)
     except FileNotFoundError:
         print(f"error: file not found: {args.csv}", file=sys.stderr)
+        return 2
+    except IsADirectoryError:
+        print(f"error: expected a file, got a directory: {args.csv}", file=sys.stderr)
+        return 2
+    except PermissionError:
+        print(f"error: permission denied: {args.csv}", file=sys.stderr)
         return 2
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
     graph = build_graph(txs)
-    findings = analyze(graph, threshold=args.threshold)
+    try:
+        findings = analyze(graph, threshold=args.threshold)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     if args.format == "json":
         payload = {

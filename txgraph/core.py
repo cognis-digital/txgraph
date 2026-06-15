@@ -16,12 +16,24 @@ from __future__ import annotations
 
 import csv
 import io
+import json
+import os
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional
 
 # Default reporting threshold (USD). Structuring is sub-threshold by design.
 DEFAULT_REPORT_THRESHOLD = 10000.0
+
+TOOL_NAME = "txgraph"
+# Read the version from the VERSION file next to the package root; fall back to
+# a hardcoded default so the package always imports even if the file is absent.
+try:
+    _VERSION_FILE = os.path.join(os.path.dirname(__file__), "..", "VERSION")
+    with open(_VERSION_FILE, encoding="utf-8") as _f:
+        TOOL_VERSION = _f.read().strip()
+except Exception:
+    TOOL_VERSION = "0.1.0"
 
 
 def _parse_ts(raw: str) -> datetime:
@@ -86,12 +98,35 @@ def load_transactions(source) -> List[Transaction]:
 
     Required (or aliased) columns: tx_id, src, dst, amount, timestamp.
     Optional: currency. Rows with bad data raise ValueError with the row number.
+
+    Raises:
+        FileNotFoundError: if *source* is a path that does not exist.
+        IsADirectoryError: if *source* is a path pointing to a directory.
+        PermissionError: if the file cannot be read due to OS permissions.
+        ValueError: for malformed CSV content (missing columns, bad rows).
     """
     if hasattr(source, "read"):
-        text = source.read()
+        try:
+            text = source.read()
+        except Exception as exc:
+            raise ValueError(f"cannot read input stream: {exc}") from exc
     else:
-        with open(source, "r", encoding="utf-8-sig", newline="") as fh:
-            text = fh.read()
+        path = str(source)
+        if os.path.isdir(path):
+            raise IsADirectoryError(f"expected a file, got a directory: {path!r}")
+        try:
+            with open(path, "r", encoding="utf-8-sig", newline="") as fh:
+                text = fh.read()
+        except FileNotFoundError:
+            raise
+        except PermissionError:
+            raise
+        except UnicodeDecodeError as exc:
+            raise ValueError(
+                f"file {path!r} is not valid UTF-8 text: {exc}"
+            ) from exc
+        except OSError as exc:
+            raise ValueError(f"cannot open {path!r}: {exc}") from exc
 
     reader = csv.DictReader(io.StringIO(text))
     if reader.fieldnames is None:
@@ -192,6 +227,18 @@ def detect_structuring(
     """Flag a source making >= min_count sub-threshold transfers that aggregate
     past the reporting threshold within window_hours (classic smurfing).
     """
+    if threshold <= 0:
+        raise ValueError(
+            f"structuring threshold must be positive, got {threshold}"
+        )
+    if window_hours <= 0:
+        raise ValueError(
+            f"window_hours must be positive, got {window_hours}"
+        )
+    if min_count < 2:
+        raise ValueError(
+            f"min_count must be >= 2, got {min_count}"
+        )
     findings: List[Finding] = []
     window = window_hours * 3600.0
     for acct in sorted(g.accounts):
@@ -231,52 +278,64 @@ def detect_layering(
     max_gap_hours: float = 48.0,
     amount_tol: float = 0.15,
     passthrough_min: float = 0.80,
+    max_chain_depth: int = 50,
 ) -> List[Finding]:
     """Trace pass-through chains: A->B->C->... where each intermediary forwards
     a similar amount soon after receiving it. Long fast chains == layering.
+
+    *max_chain_depth* caps the iterative walk to prevent runaway loops on
+    pathological or adversarially crafted graphs.
     """
     findings: List[Finding] = []
     max_gap = max_gap_hours * 3600.0
     seen_chains: set = set()
 
-    def follow(tx: Transaction, chain: List[Transaction], visited: set):
-        node = tx.dst
-        # find an onward transfer that forwards most of the received amount soon
-        best: Optional[Transaction] = None
-        for nxt in sorted(g.out_edges(node), key=lambda t: t.epoch()):
-            if nxt.dst in visited:
-                continue
-            gap = nxt.epoch() - tx.epoch()
-            if gap < 0 or gap > max_gap:
-                continue
-            ratio = nxt.amount / tx.amount if tx.amount else 0
-            if passthrough_min <= ratio <= 1 + amount_tol:
-                best = nxt
+    def follow(start_tx: Transaction) -> None:
+        """Iterative walk from start_tx, bounded by max_chain_depth."""
+        chain: List[Transaction] = [start_tx]
+        visited: set = {start_tx.src, start_tx.dst}
+        tx = start_tx
+
+        while len(chain) < max_chain_depth:
+            node = tx.dst
+            best: Optional[Transaction] = None
+            for nxt in sorted(g.out_edges(node), key=lambda t: t.epoch()):
+                if nxt.dst in visited:
+                    continue
+                gap = nxt.epoch() - tx.epoch()
+                if gap < 0 or gap > max_gap:
+                    continue
+                ratio = nxt.amount / tx.amount if tx.amount else 0
+                if passthrough_min <= ratio <= 1 + amount_tol:
+                    best = nxt
+                    break
+            if best is None:
                 break
-        if best is None:
-            if len(chain) >= min_hops:
-                key = tuple(t.tx_id for t in chain)
-                if key not in seen_chains:
-                    seen_chains.add(key)
-                    accts = [chain[0].src] + [t.dst for t in chain]
-                    amt = chain[0].amount
-                    findings.append(Finding(
-                        kind="layering",
-                        severity="high" if len(chain) >= min_hops + 1 else "medium",
-                        accounts=accts,
-                        tx_ids=[t.tx_id for t in chain],
-                        amount=round(amt, 2),
-                        detail=(f"{len(chain)}-hop pass-through chain "
-                                + " -> ".join(accts)
-                                + f" moving ~${amt:,.2f}"),
-                        score=round(len(chain) + amt / 10000.0, 3),
-                    ))
-            return
-        follow(best, chain + [best], visited | {best.dst})
+            chain.append(best)
+            visited.add(best.dst)
+            tx = best
+
+        if len(chain) >= min_hops:
+            key = tuple(t.tx_id for t in chain)
+            if key not in seen_chains:
+                seen_chains.add(key)
+                accts = [chain[0].src] + [t.dst for t in chain]
+                amt = chain[0].amount
+                findings.append(Finding(
+                    kind="layering",
+                    severity="high" if len(chain) >= min_hops + 1 else "medium",
+                    accounts=accts,
+                    tx_ids=[t.tx_id for t in chain],
+                    amount=round(amt, 2),
+                    detail=(f"{len(chain)}-hop pass-through chain "
+                            + " -> ".join(accts)
+                            + f" moving ~${amt:,.2f}"),
+                    score=round(len(chain) + amt / 10000.0, 3),
+                ))
 
     # only start chains at sources that are not pure pass-throughs themselves
     for tx in sorted(g.txs, key=lambda t: t.epoch()):
-        follow(tx, [tx], {tx.src, tx.dst})
+        follow(tx)
     # keep only the longest chain per starting tx
     findings.sort(key=lambda f: -len(f.tx_ids))
     deduped: List[Finding] = []
@@ -365,3 +424,36 @@ def sar_summary(findings: List[Finding], graph: TransactionGraph) -> str:
         lines.append("")
     lines.append("Recommend manual review and, where warranted, regulatory filing.")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Convenience helpers used by mcp_server and external callers
+# ---------------------------------------------------------------------------
+
+def scan(
+    source,
+    threshold: float = DEFAULT_REPORT_THRESHOLD,
+) -> dict:
+    """Load *source* (path or stream), build graph, run all detectors.
+
+    Returns a dict that mirrors the JSON payload emitted by the CLI
+    ``scan --format json`` command so callers have a single stable shape.
+
+    Raises the same exceptions as :func:`load_transactions` on bad input.
+    """
+    txs = load_transactions(source)
+    graph = build_graph(txs)
+    findings = analyze(graph, threshold=threshold)
+    return {
+        "tool": TOOL_NAME,
+        "version": TOOL_VERSION,
+        "transactions": len(graph.txs),
+        "accounts": len(graph.accounts),
+        "finding_count": len(findings),
+        "findings": [f.to_dict() for f in findings],
+    }
+
+
+def to_json(result: dict, *, indent: int = 2) -> str:
+    """Serialize the dict returned by :func:`scan` to a JSON string."""
+    return json.dumps(result, indent=indent, default=str)

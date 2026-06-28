@@ -1,0 +1,28 @@
+$ txgraph-emit --help
+
+usage: txgraph [-h] [--version] COMMAND ...
+
+Build a transaction graph and surface AML structuring / layering / mule patterns from a CSV.
+
+positional arguments:
+  COMMAND
+    scan      Scan a transaction CSV for suspicious patterns.
+
+options:
+  -h, --help  show this help message and exit
+  --version   show program's version number and exit
+
+Command-line interface for TXGRAPH.
+
+Examples:
+  # Scan a CSV and print a findings table
+  txgraph scan demos/01-basic/transactions.csv
+
+  # Emit JSON for a CI gate (exits non-zero when findings exist)
+  txgraph scan transactions.csv --format json > findings.json
+
+  # Print the SAR narrative
+  txgraph scan transactions.csv --sar
+
+  # Custom structuring threshold
+  txgraph scan transactions.csv --threshold 5000

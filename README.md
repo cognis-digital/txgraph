@@ -20,6 +20,73 @@ pip install cognis-txgraph
 txgraph scan .            # → prioritized findings in seconds
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ txgraph-emit --version
+txgraph 0.1.0
+```
+
+```console
+$ txgraph-emit --help
+usage: txgraph [-h] [--version] COMMAND ...
+
+Build a transaction graph and surface AML structuring / layering / mule patterns from a CSV.
+
+positional arguments:
+  COMMAND
+    scan      Scan a transaction CSV for suspicious patterns.
+
+options:
+  -h, --help  show this help message and exit
+  --version   show program's version number and exit
+
+Command-line interface for TXGRAPH.
+
+Examples:
+  # Scan a CSV and print a findings table
+  txgraph scan demos/01-basic/transactions.csv
+
+  # Emit JSON for a CI gate (exits non-zero when findings exist)
+  txgraph scan transactions.csv --format json > findings.json
+
+  # Print the SAR narrative
+  txgraph scan transactions.csv --sar
+
+  # Custom structuring threshold
+  txgraph scan transactions.csv --threshold 5000
+```
+
+> Blocks above are real `txgraph` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"tx_id": "1234567890",
+"findings": [
+    {
+        "id": "finding-1",
+        "title": "Suspicious Network Traffic",
+        "description": "Network traffic from unknown IP address",
+        "severity": "high"
+    },
+    {
+        "id": "finding-2",
+        "title": "Unusual File Access",
+        "description": "File access from unauthorized user",
+        "severity": "medium"
+    }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install** (Python 3.9+):

@@ -1,0 +1,3 @@
+$ txgraph-emit --version
+
+txgraph 0.1.0
